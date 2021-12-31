@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    vault:
+      uri: http://localhost:8200
+      application-name: appsecrets
+      authentication: token
+      token: s.Uo2wZkt7AezWId0nheju220T
