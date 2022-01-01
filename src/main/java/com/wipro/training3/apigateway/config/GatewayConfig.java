@@ -12,11 +12,16 @@ public class GatewayConfig {
 	public RouteLocator gatewayRoute(
 			RouteLocatorBuilder builder) {
 		return builder.routes()
+				.route(p -> p.path("/auth/**")
+						.filters(f -> f.rewritePath(
+			    				   "/auth/(?<segment>.*)", 
+			    				   "/api/${segment}"))
+                        .uri("lb://auth-server"))
 				      .route(p -> p.path("/topics/**")
 				    		       .filters(f -> f.rewritePath(
 				    				   "/topics/(?<segment>.*)", 
 				    				   "/api/courses/${segment}"))
-	                               .uri("lbs://course-details/"))
+	                               .uri("lb://course-details/"))
 				      .build();
 	}
 }

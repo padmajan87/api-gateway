@@ -3,8 +3,8 @@ package com.wipro.training3.apigateway.security;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class JwtAuthenticationFilter 
-                               implements GatewayFilter {
+                               implements GlobalFilter {
 	
 	private JwtUtil jwtUtil;
 
@@ -31,7 +31,7 @@ public class JwtAuthenticationFilter
 		ServerHttpRequest req 
 		       = (ServerHttpRequest) exchange.getRequest();
 		
-		final List<String> apiEndpoints = List.of("/addUser", "/login");
+		final List<String> apiEndpoints = List.of("/api/register", "/api/login");
 		
 		Predicate<ServerHttpRequest> isApiSecured 
 		            = r -> apiEndpoints.stream()
@@ -45,21 +45,19 @@ public class JwtAuthenticationFilter
 			    response.setStatusCode(HttpStatus.UNAUTHORIZED);
 			   return response.setComplete();
 			}
-		}
-		
-		final String token = req.getHeaders()
-				                .getOrEmpty("Authorization")
-				                .get(0);
-		
-		if(!jwtUtil.validateToken(token)) {
+			
+			final String token = req.getHeaders()
+	                .getOrEmpty("Authorization")
+	                .get(0);
+
+			if(!jwtUtil.validateToken(token)) {
 			ServerHttpResponse response = exchange.getResponse();
 			response.setStatusCode(HttpStatus.BAD_REQUEST);
-
+			
 			return response.setComplete();
+			}
 		}
-		
 		return chain.filter(exchange);
     }
-
 	
 }
